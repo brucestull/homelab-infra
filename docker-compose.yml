@@ -1,0 +1,37 @@
+services:
+  unbound:
+    image: madnuttah/unbound:1.25.2-0
+    container_name: unbound
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      TZ: ${TZ}
+    volumes:
+      - ./unbound/unbound.conf:/usr/local/unbound/unbound.conf:ro
+    healthcheck:
+      test: /usr/local/unbound/sbin/healthcheck.sh
+      interval: 60s
+      timeout: 15s
+      retries: 3
+      start_period: 15s
+
+  pihole:
+    image: pihole/pihole:2026.07.2
+    container_name: pihole
+    restart: unless-stopped
+    network_mode: host
+    depends_on:
+      unbound:
+        condition: service_healthy
+    environment:
+      TZ: ${TZ}
+      FTLCONF_webserver_api_password: ${FTLCONF_webserver_api_password}
+      FTLCONF_dns_upstreams: '127.0.0.1#5335'
+      FTLCONF_dns_listeningMode: ${FTLCONF_dns_listeningMode}
+    volumes:
+      - ./etc-pihole:/etc/pihole
+      - ./etc-dnsmasq.d:/etc/dnsmasq.d
+    cap_add:
+      - NET_ADMIN
+      - SYS_TIME
+      - SYS_NICE

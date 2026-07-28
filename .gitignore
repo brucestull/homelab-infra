@@ -1,0 +1,12 @@
+# --- Secrets ---
+.env
+
+# --- Pi-hole bind-mount (all container-generated runtime state) ---
+# Contains: cli_pw, pihole.toml (password hash), TLS private key,
+# FTL query database, DHCP leases, gravity blocklists, caches.
+etc-pihole/
+!etc-pihole/.gitkeep
+
+# --- dnsmasq bind-mount (container-generated) ---
+etc-dnsmasq.d/
+!etc-dnsmasq.d/.gitkeep
