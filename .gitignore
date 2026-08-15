@@ -4,9 +4,9 @@
 # --- Pi-hole bind-mount (all container-generated runtime state) ---
 # Contains: cli_pw, pihole.toml (password hash), TLS private key,
 # FTL query database, DHCP leases, gravity blocklists, caches.
-etc-pihole/
-!etc-pihole/.gitkeep
+dns-stack/etc-pihole/
+!dns-stack/etc-pihole/.gitkeep
 
 # --- dnsmasq bind-mount (container-generated) ---
-etc-dnsmasq.d/
-!etc-dnsmasq.d/.gitkeep
+dns-stack/etc-dnsmasq.d/
+!dns-stack/etc-dnsmasq.d/.gitkeep
