@@ -1,0 +1,8 @@
+---
+- name: First playbook — verify connectivity and report host info
+  hosts: dns_servers
+  gather_facts: true
+  tasks:
+    - name: Show a friendly message with the host's OS
+      ansible.builtin.debug:
+        msg: "Hello from {{ inventory_hostname }} running {{ ansible_distribution }} {{ ansible_distribution_version }}"
