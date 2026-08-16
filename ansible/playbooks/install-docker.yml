@@ -1,0 +1,60 @@
+---
+- name: Install Docker Engine and Compose plugin
+  hosts: dns_servers
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Confirm we can reach the host and see its OS
+      ansible.builtin.debug:
+        msg: >-
+          Preparing to install Docker on {{ inventory_hostname }}
+          ({{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_version'] }})
+    - name: Install prerequisite packages
+      ansible.builtin.apt:
+        name:
+          - ca-certificates
+          - curl
+          - python3-debian
+        state: present
+        update_cache: true
+    - name: Create the apt keyrings directory
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: "0755"
+    - name: Download Docker's official GPG key
+      ansible.builtin.get_url:
+        url: https://download.docker.com/linux/debian/gpg
+        dest: /etc/apt/keyrings/docker.asc
+        mode: "0644"
+    - name: Add the Docker apt repository (deb822 format)
+      ansible.builtin.deb822_repository:
+        name: docker
+        types: [deb]
+        uris: https://download.docker.com/linux/debian
+        suites: "{{ ansible_facts['distribution_release'] }}"
+        components: [stable]
+        architectures: "{{ ansible_facts['architecture'] | replace('aarch64', 'arm64') }}"
+        signed_by: /etc/apt/keyrings/docker.asc
+        state: present
+        enabled: true
+      notify: Update apt cache
+    - name: Install Docker Engine and Compose plugin
+      ansible.builtin.apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+        state: present
+        update_cache: true
+    - name: Add the user to the docker group
+      ansible.builtin.user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: true
+  handlers:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
