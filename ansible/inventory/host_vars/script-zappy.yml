@@ -1,0 +1,5 @@
+---
+# Per-host values for script-zappy.
+# PIHOLE_IP is currently the temporary DHCP-reserved address (.229).
+# At the .11 cutover, change this one line and re-run the deploy playbook.
+pihole_ip: "192.168.1.229"
